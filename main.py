@@ -1,74 +1,147 @@
-import numpy as np 
+# Data process
+import numpy as np
+import datetime as dt
 import pandas as pd
+
+# Yahoo Finance
 import yfinance as yf
-import matplotlib.pyplot as plt
+import financedatabase as fd
+
+# Data viz
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
-st.set_page_config(page_title="Investment Dashboard", layout="wide")
+# App config
+#----------------------------------------------------------------------------------------------------------------------------------#
+# Page config
+st.set_page_config(
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-st.title("📈 Investment Portfolio Dashboard")
+# App title
+st.title('Portfolio Analysis')
 
-# --- User Input ---
-assets_input = st.text_input("Provide your assets (comma-separated)", "AAPL, MSFT, GOOGL")
-assets = [ticker.strip().upper() for ticker in assets_input.split(',') if ticker.strip()]
-st.write("✅ Parsed Tickers:", assets)
+# Import ticker list
+#----------------------------------------------------------------------------------------------------------------------------------#
+@st.cache_data
+def load_data():
+    # Pulling list of all ETFs and Equities from financedatabase
+    ticker_list = pd.concat([fd.ETFs().select().reset_index()[['symbol', 'name']],
+                             fd.Equities().select().reset_index()[['symbol', 'name']]])
+    ticker_list = ticker_list[ticker_list.symbol.notna()]
+    ticker_list['symbol_name'] = ticker_list.symbol + ' - ' + ticker_list.name
 
-start = st.date_input("Pick a starting date for your analysis", 
-                      value=pd.to_datetime('2022-06-01'))
+    return ticker_list
+ticker_list = load_data()
 
-# --- Data Download ---
-raw_data = yf.download(assets, start=start)
+# Side bar
+#----------------------------------------------------------------------------------------------------------------------------------#
+with st.sidebar:
+    # Portfolio builder
+    sel_tickers = st.multiselect('Portfolio Builder', placeholder="Search tickers", options=ticker_list.symbol_name)
+    sel_tickers_list = ticker_list[ticker_list.symbol_name.isin(sel_tickers)].symbol
 
-# Handle different formats of Adj Close
-if 'Adj Close' in raw_data.columns:
-    data = raw_data['Adj Close']
-elif isinstance(raw_data.columns, pd.MultiIndex) and 'Adj Close' in raw_data.columns.levels[0]:
-    data = raw_data['Adj Close']
+    # Display logos
+    cols = st.columns(4)
+    for i, ticker in enumerate(sel_tickers_list):
+        try:
+            cols[i % 4].image('https://logo.clearbit.com/' + yf.Ticker(ticker).info['website'].replace('https://www.', ''), width=65)
+        except:
+            cols[i % 4].subheader(ticker)
+
+    # Date selector
+    cols = st.columns(2)
+    sel_dt1 = cols[0].date_input('Start Date', value=dt.datetime(2024,1,1), format='YYYY-MM-DD')
+    sel_dt2 = cols[1].date_input('End Date', format='YYYY-MM-DD')
+
+    # Select tickers data
+    if len(sel_tickers) != 0:
+        yfdata = yf.download(list(sel_tickers_list), start=sel_dt1, end=sel_dt2)['Close'].reset_index().melt(id_vars = ['Date'], var_name = 'ticker', value_name='price')
+        yfdata['price_start'] = yfdata.groupby('ticker').price.transform('first')
+        yfdata['price_pct_daily'] = yfdata.groupby('ticker').price.pct_change()
+        yfdata['price_pct'] = (yfdata.price - yfdata.price_start) / yfdata.price_start
+
+# Tabs
+#----------------------------------------------------------------------------------------------------------------------------------#
+
+tab1, tab2 = st.tabs(['Portfolio', 'Calculator'])
+
+if len(sel_tickers) == 0:
+    st.info('Select tickers to view plots')
 else:
-    st.error("❌ No 'Adj Close' column found in downloaded data. Check ticker symbols.")
-    st.stop()
+    st.empty()
 
-# Check if data is valid
-if data is None or data.empty:
-    st.error("❌ Failed to retrieve data. Please check your ticker symbols.")
-    st.stop()
+    # Tab 1
+    #----------------------------------------------------------------------------------------------------------------------------------#
+    with tab1:
+        # All stocks plot
+        st.subheader('All Stocks')
+        fig = px.line(yfdata, x='Date', y='price_pct', color='ticker', markers=True)
+        fig.add_hline(y=0, line_dash="dash", line_color="white") 
+        fig.update_layout(xaxis_title=None, yaxis_title=None)
+        fig.update_yaxes(tickformat=',.0%') 
+        st.plotly_chart(fig, use_container_width=True)
 
-# --- Portfolio Returns ---
-ret_df = data.pct_change()
-cumul_ret = (ret_df + 1).cumprod() - 1
-pf_cumul_ret = cumul_ret.mean(axis=1)
+        # Individual stock plots
+        st.subheader('Individual Stock')
+        cols = st.columns(3)
+        for i, ticker in enumerate(sel_tickers_list):
+            # Adding logo
+            try:
+                cols[i % 3].image('https://logo.clearbit.com/' + yf.Ticker(ticker).info['website'].replace('https://www.', ''), width=65)
+            except:
+                cols[i % 3].subheader(ticker)
 
-# --- Benchmark Data ---
-bench_raw = yf.download('^GSPC', start=start)
-if 'Adj Close' in bench_raw.columns:
-    benchmark = bench_raw['Adj Close']
-else:
-    st.error("❌ Benchmark data could not be retrieved.")
-    st.stop()
+            # Stock metrics
+            cols2 = cols[i % 3].columns(3)
+            ticker = 'Close' if len(sel_tickers_list) == 1 else ticker
+            cols2[0].metric(label='50-Day Average', value=round(yfdata[yfdata.ticker == ticker].price.tail(50).mean(),2))
+            cols2[1].metric(label='1-Year Low', value=round(yfdata[yfdata.ticker == ticker].price.tail(365).min(),2))
+            cols2[2].metric(label='1-Year High', value=round(yfdata[yfdata.ticker == ticker].price.tail(365).max(),2))
 
-bench_ret = benchmark.pct_change()
-bench_dev = (bench_ret + 1).cumprod() - 1
-bench_risk = bench_ret.std()
+            # Stock plot
+            fig = px.line(yfdata[yfdata.ticker == ticker], x='Date', y='price', markers=True)
+            fig.update_layout(xaxis_title=None, yaxis_title=None)
+            cols[i % 3].plotly_chart(fig, use_container_width=True)
 
-# --- Portfolio Risk ---
-W = np.ones(len(ret_df.columns)) / len(ret_df.columns)
-pf_std = (W.dot(ret_df.cov()).dot(W)) ** 0.5
+    # Tab 2
+    #----------------------------------------------------------------------------------------------------------------------------------#
+    with tab2:
+        # Amounts input
+        cols_tab2 = st.columns((0.2,0.8))
+        total_inv = 0
+        amounts = {}
+        for i, ticker in enumerate(sel_tickers_list):
+            cols = cols_tab2[0].columns((0.1,0.3))
+            try:
+                cols[0].image('https://logo.clearbit.com/' + yf.Ticker(ticker).info['website'].replace('https://www.', ''), width=65)
+            except:
+                cols[0].subheader(ticker)
 
-# --- Chart: Portfolio vs Benchmark ---
-st.subheader("📊 Portfolio vs. S&P 500 Performance")
-tog = pd.concat([bench_dev, pf_cumul_ret], axis=1)
-tog.columns = ['S&P 500 Performance', 'Portfolio Performance']
-st.line_chart(tog)
+            amount = cols[1].number_input('', key=ticker, step=50)
+            total_inv = total_inv + amount
+            amounts[ticker] = amount
 
-# --- Risk Metrics ---
-st.subheader("📉 Portfolio Risk (Volatility)")
-st.write(f"Portfolio Standard Deviation: `{pf_std:.4f}`")
+        # Investment goals
+        cols_tab2[1].subheader('Total Investment: ' + str(total_inv))
+        cols_goal = cols_tab2[1].columns((0.06,0.20,0.7))
+        cols_goal[0].text('')
+        cols_goal[0].subheader('Goal: ')
+        goal = cols_goal[1].number_input('', key='goal', step=50)
 
-st.subheader("📉 Benchmark Risk")
-st.write(f"S&P 500 Standard Deviation: `{bench_risk:.4f}`")
+        # Plot
+        df = yfdata.copy()
+        df['amount'] = df.ticker.map(amounts) * (1 + df.price_pct)
 
-# --- Portfolio Composition Pie ---
-st.subheader("📌 Portfolio Composition")
-fig, ax = plt.subplots(facecolor='#121212')
-ax.pie(W, labels=data.columns, autopct='%1.1f%%', textprops={'color': 'white'})
-st.pyplot(fig)
+        dfsum = df.groupby('Date').amount.sum().reset_index()
+        fig = px.area(df, x='Date', y='amount', color='ticker')
+        fig.add_hline(y=goal, line_color='rgb(57,255,20)', line_dash='dash', line_width=3)
+        if dfsum[dfsum.amount >= goal].shape[0] == 0:
+            cols_tab2[1].warning("The goal can't be reached within this time frame. Either change the goal amount or the time frame.")
+        else:
+            fig.add_vline(x=dfsum[dfsum.amount >= goal].Date.iloc[0], line_color='rgb(57,255,20)', line_dash='dash', line_width=3)
+            fig.add_trace(go.Scatter(x=[dfsum[dfsum.amount >= goal].Date.iloc[0] + dt.timedelta(days=7)], y=[goal*1.1], text=[dfsum[dfsum.amount >= goal].Date.dt.date.iloc[0]], mode='text', name="Goal", textfont=dict(color='rgb(57,255,20)', size=20)))
+        fig.update_layout(xaxis_title=None, yaxis_title=None)
+        cols_tab2[1].plotly_chart(fig, use_container_width=True)
