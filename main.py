@@ -4,4 +4,4 @@ import plotly.express as px
 st.title('Stock Dashboard')
 ticker = st.sidebar.text_input('Ticker')
 start_date = st.sidebar.date_input('Start Date')
-end_date = st.sideba.date_input('End Date')
+end_date = st.sidebar.date_input('End Date')
