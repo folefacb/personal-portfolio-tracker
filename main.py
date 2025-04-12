@@ -48,5 +48,13 @@ Here, you can learn more about my portfolio, academic journey, and even a few of
             "[GitHub](https://github.com/folefacb)",
             unsafe_allow_html=True
         )
+    col3, col4 = st.columns([0.1, 0.9])
+    with col3:
+        st.image("https://cdn-icons-png.flaticon.com/512/337/337946.png", width=30)  # resume icon
+    with col4:
+        st.markdown(
+            "[View My Resume](file:///C:/Users/bebon/Downloads/resume%20(43).pdf)",
+            unsafe_allow_html=True
+        )
                 
 
