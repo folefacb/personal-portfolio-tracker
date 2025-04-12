@@ -110,7 +110,9 @@ if page == "Projects":
             )
 
             st.plotly_chart(fig, use_container_width=True)
-
+            st.markdown( """ The project revolves around developing a sophisticated algorithm designed for trading bond ETFs within the QuantConnect framework. 
+            The primary objective of this project was to create an effective trading strategy that employs risk management techniques such as moving averages, 
+            stop-loss, and take-profit strategies, thereby optimizing the performance of a diversified portfolio.""")
     with tab2:
         st.header("Data Display Dashboard")
         st.markdown("""A sleek, interactive data visualization dashboard built with Streamlit and Plotly.  
