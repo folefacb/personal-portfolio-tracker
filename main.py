@@ -79,53 +79,79 @@ if page == "Projects":
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
     
-        # Setup plot
-        fig = go.Figure()
+        etfs = ['SPY', 'VTI', 'IVV']  # Example ETFs
+    start_date = df['Time'].min().strftime('2007-03-26')  # Use the start date of the portfolio data
+    end_date = df['Time'].max().strftime('2024-12-11')  # Use the end date of the portfolio data
     
-        # Cumulative portfolio value line
+    # Fetch historical data for the ETFs
+    etf_data = yf.download(etfs, start=start_date, end=end_date)['Adj Close']
+    
+    # Normalize ETF prices for easier comparison
+    etf_data_normalized = etf_data / etf_data.iloc[0]  # Normalize to start at the same value
+    
+    # Cumulative portfolio value line
+    fig = go.Figure()
+    
+    # Plot Portfolio Value
+    fig.add_trace(go.Scatter(
+        x=df['Time'],
+        y=df['Value'],
+        mode='lines',
+        name='Portfolio Value',
+        line=dict(color='#00ffff', width=2.5)
+    ))
+    
+    # Buys
+    buys = df[df['Quantity'] > 0]
+    fig.add_trace(go.Scatter(
+        x=buys['Time'],
+        y=buys['Value'],
+        mode='markers',
+        name='Buy',
+        marker=dict(color='limegreen', size=12, symbol='triangle-up'),
+        hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
+    ))
+    
+    # Sells
+    sells = df[df['Quantity'] < 0]
+    fig.add_trace(go.Scatter(
+        x=sells['Time'],
+        y=sells['Value'],
+        mode='markers',
+        name='Sell',
+        marker=dict(color='crimson', size=12, symbol='triangle-down'),
+        hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
+    ))
+    
+    # Plot the ETF data on the second y-axis
+    for etf in etfs:
         fig.add_trace(go.Scatter(
-            x=df['Time'],
-            y=df['Value'],
+            x=etf_data_normalized.index,
+            y=etf_data_normalized[etf],
             mode='lines',
-            name='Portfolio Value',
-            line=dict(color='#00ffff', width=2.5)
+            name=etf,
+            yaxis='y2'
         ))
     
-        # Buys
-        buys = df[df['Quantity'] > 0]
-        fig.add_trace(go.Scatter(
-            x=buys['Time'],
-            y=buys['Value'],
-            mode='markers',
-            name='Buy',
-            marker=dict(color='limegreen', size=12, symbol='triangle-up'),
-            hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
-        ))
+    # Layout aesthetics like QuantConnect
+    fig.update_layout(
+        title='📈 Portfolio and ETF Comparison',
+        xaxis=dict(title='Date', rangeslider=dict(visible=True)),
+        yaxis=dict(title='Portfolio Value ($)', fixedrange=False),
+        yaxis2=dict(
+            title='ETF Prices (Normalized)',
+            overlaying='y',
+            side='right'
+        ),
+        hovermode='x unified',
+        template='plotly_dark',
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        margin=dict(l=40, r=40, t=60, b=40),
+        height=600
+    )
     
-        # Sells
-        sells = df[df['Quantity'] < 0]
-        fig.add_trace(go.Scatter(
-            x=sells['Time'],
-            y=sells['Value'],
-            mode='markers',
-            name='Sell',
-            marker=dict(color='crimson', size=12, symbol='triangle-down'),
-            hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
-        ))
-    
-        # Layout aesthetics like QuantConnect
-        fig.update_layout(
-            title='📈 Bond Trading Strategy Backtest',
-            xaxis=dict(title='Date', rangeslider=dict(visible=True)),
-            yaxis=dict(title='Portfolio Value ($)', fixedrange=False),
-            hovermode='x unified',
-            template='plotly_dark',
-            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
-            margin=dict(l=40, r=40, t=60, b=40),
-            height=600
-        )
-    
-        st.plotly_chart(fig, use_container_width=True)
+    # Display the plot
+    st.plotly_chart(fig, use_container_width=True)
     
         
     with tab2:
