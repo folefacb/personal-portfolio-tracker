@@ -68,7 +68,7 @@ if page == "Projects":
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/bond-trading-algorithm)")
         # Upload Excel file
-        uploaded_file = 
+        uploaded_file = r"Determined Yellow DInosaur_trades.csv"
         
         if uploaded_file:
             # Load Excel into DataFrame
