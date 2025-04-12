@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
 
 st.sidebar.title("Navigation")
-page = st.sidebar.radio("Go to", ["Home", "Projects", "Research/Thesis", "Hobbies and Interests"])
+page = st.sidebar.radio("Go to", ["Home", "Projects"])
 
 if page == "Home":
     col1, col2 = st.columns([2, 1.5])  # Wider column for text, smaller for image
@@ -118,9 +118,4 @@ if page == "Projects":
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/data-dashboard)")
 
-    with tab3:
-        st.header("Chess AI Machine Learning Bot")
-        st.markdown("""This AI bot was trained to play chess using reinforcement learning and neural networks.  
-        The model learns from thousands of simulated games and improves over time by evaluating board positions.
-        """)
-        st.markdown("[🔗 View on GitHub](https://github.com/your-username/chess-ai-bot)")
+   
