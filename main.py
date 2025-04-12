@@ -12,7 +12,7 @@ st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Projects", "Research/Thesis", "Hobbies and Interests"])
 
 if page == "Home":
-    col1, col2 = st.columns([2, 1])  # Wider column for text, smaller for image
+    col1, col2 = st.columns([2, 2])  # Wider column for text, smaller for image
 
     with col1:
         st.title("Hi There! It's me, Bebongnchu!")
