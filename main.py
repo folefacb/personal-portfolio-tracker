@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
+import teachnical-analysis
 
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
