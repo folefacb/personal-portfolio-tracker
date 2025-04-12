@@ -57,7 +57,7 @@ Here, you can learn more about my portfolio, academic journey, and even a few of
         )
 
 if page == "Projects":
-    tab1, tab2, tab3 = st.tabs(["📈 Bond Trading Algorithm", "📊 Data Display Dashboard", "♟️ Chess AI Bot"])
+    tab1, tab2 = st.tabs(["📈 Bond Trading Algorithm", "📊 Data Display Dashboard"])
 
     with tab1:
         st.header("Bond Trading Algorithm")
