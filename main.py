@@ -6,6 +6,7 @@ import streamlit as st
 
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
+link = "link.png'
 
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Projects", "Research/Thesis", "Hobbies and Interests"])
@@ -23,6 +24,21 @@ Here, you can learn more about my portfolio, academic journey, and even a few of
 
     with col2:
         st.image(photo_me, use_container_width=True)
+    st.markdown("---")  # horizontal line for separation
+
+    # Dashboard-style LinkedIn button
+    st.subheader("Connect with me")
+
+    col3, col4 = st.columns([0.1, 0.9])
+
+    with col3:
+        st.image("https://cdn-icons-png.flaticon.com/512/174/174857.png", width=30)
+
+    with col4:
+        st.markdown(
+            "[LinkedIn](https://www.linkedin.com/in/your-linkedin-username)",
+            unsafe_allow_html=True
+        )
 
     
                 
