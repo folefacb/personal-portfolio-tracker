@@ -63,4 +63,51 @@ if page == "Projects":
         st.header("Bond Trading Algorithm")
         st.markdown("""
         This project involves an automated bond trading algorithm using QuantConnect.  
-        It utilizes indicators
+        It utilizes indicators like moving averages and implements position sizing, stop-loss, and take-profit strategies.  
+        Designed for risk-adjusted returns and market efficiency.
+        """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/bond-trading-algorithm)")
+    
+        # Load the trade file
+        uploaded_file = r"Determined Yellow Dinosaur_trades.csv"
+        df = pd.read_csv(uploaded_file)
+    
+        # Preprocessing
+        df['Time'] = pd.to_datetime(df['Time'])
+        df = df.sort_values('Time')
+
+        # Portfolio Value Line (Use Streamlit's line_chart for continuous line)
+        st.subheader("Portfolio Value Over Time")
+        st.line_chart(df.set_index('Time')['Value'])
+
+        # Buys and Sells using Streamlit's scatter_chart
+        buys = df[df['Quantity'] > 0]
+        sells = df[df['Quantity'] < 0]
+
+        # Plotting buys and sells as scatter charts
+        st.subheader("Buy and Sell Events")
+        
+        buy_data = buys[['Time', 'Value']]
+        sell_data = sells[['Time', 'Value']]
+
+        # Display Buy and Sell events
+        st.markdown("**Buy Events**")
+        st.scatter_chart(buy_data.set_index('Time'))
+
+        st.markdown("**Sell Events**")
+        st.scatter_chart(sell_data.set_index('Time'))
+        
+    with tab2:
+        st.header("Data Display Dashboard")
+        st.markdown("""
+        A sleek, interactive data visualization dashboard built with Streamlit and Plotly.  
+        It allows users to explore stock prices, custom filters, and generate insights from uploaded datasets.
+        """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/data-dashboard)")
+
+    with tab3:
+        st.header("Chess AI Machine Learning Bot")
+        st.markdown("""
+        This AI bot was trained to play chess using reinforcement learning and neural networks.  
+        The model learns from thousands of simulated games and improves over time by evaluating board positions.
+        """)
