@@ -6,3 +6,4 @@ numpy
 financedatabase
 plotly
 technical-analysis
+Indicators
