@@ -15,7 +15,7 @@ if page == "Home":
     col1, col2 = st.columns([2, 1.5])  # Wider column for text, smaller for image
 
     with col1:
-        st.title("Hi There! It's me, Bebongnchu!")
+        st.title("Welcome to my personal portfolio!")
         st.markdown("""Hi! My name is Bebongnchu, and I’m a third-year Mathematics and Finance student at McMaster University with a strong passion for finance and technology.
 
 I'm always exploring the integration and intersection of both fields through hands-on projects and personal initiatives.
