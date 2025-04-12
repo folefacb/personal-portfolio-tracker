@@ -2,7 +2,8 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
-import teachnical-analysis
+import plotly.graph_objects as go
+from technical_analysis import Indicators  # Fixed import for technical-analysis package
 
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
@@ -76,33 +77,63 @@ if page == "Projects":
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
 
-        # Portfolio Value Line (Use Streamlit's line_chart for continuous line)
-        st.subheader("Buy and Sell Signal Graph")
+        # Technical analysis using the technical-analysis package
+        indicators = Indicators(df)
+        df['SMA'] = indicators.sma(window=14)  # Simple Moving Average (14 periods)
 
-        # Buys and Sells
-        buys = df[df['Quantity'] > 0]
-        sells = df[df['Quantity'] < 0]
+        # Generate Buy/Sell signals based on price crossing SMA
+        df['Buy Signal'] = (df['Close'] > df['SMA']) & (df['Close'].shift(1) <= df['SMA'].shift(1))
+        df['Sell Signal'] = (df['Close'] < df['SMA']) & (df['Close'].shift(1) >= df['SMA'].shift(1))
 
-        # Connect buys and sells with a continuous line
-        fig, ax = plt.subplots(figsize=(10, 6))
+        # Create a Plotly figure
+        fig = go.Figure()
 
-        # Plot the portfolio value (just the continuous line of the portfolio)
-        ax.plot(df['Time'], df['Value'], label='Portfolio Value', color='lightblue', alpha=0.7)
+        # Add Candlestick Chart
+        fig.add_trace(go.Candlestick(
+            x=df['Time'],
+            open=df['Open'],
+            high=df['High'],
+            low=df['Low'],
+            close=df['Close'],
+            name='Candlesticks',
+            increasing_line_color='green', decreasing_line_color='red'
+        ))
 
-        # Plot Buy signals
-        ax.scatter(buys['Time'], buys['Value'], color='green', label='Buy Signal', marker='^', s=100)
+        # Add Buy signals
+        buy_signals = df[df['Buy Signal'] == True]
+        fig.add_trace(go.Scatter(
+            x=buy_signals['Time'],
+            y=buy_signals['Close'],
+            mode='markers',
+            name='Buy Signal',
+            marker=dict(color='lime', size=10, symbol='triangle-up'),
+            hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
+        ))
 
-        # Plot Sell signals
-        ax.scatter(sells['Time'], sells['Value'], color='red', label='Sell Signal', marker='v', s=100)
+        # Add Sell signals
+        sell_signals = df[df['Sell Signal'] == True]
+        fig.add_trace(go.Scatter(
+            x=sell_signals['Time'],
+            y=sell_signals['Close'],
+            mode='markers',
+            name='Sell Signal',
+            marker=dict(color='crimson', size=10, symbol='triangle-down'),
+            hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
+        ))
 
-        # Titles and Labels
-        ax.set_title('📈 Bond Trading Strategy Backtest with Buy/Sell Signals', fontsize=14)
-        ax.set_xlabel('Date')
-        ax.set_ylabel('Portfolio Value ($)')
-        ax.legend(loc='upper left')
-        ax.grid(True)
+        # Layout customization
+        fig.update_layout(
+            title='📈 Bond Trading Strategy with Buy/Sell Signals',
+            xaxis_title='Date',
+            yaxis_title='Portfolio Value ($)',
+            xaxis_rangeslider_visible=False,
+            template='plotly_dark',
+            height=600,
+            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+        )
 
-        st.pyplot(fig)
+        # Display the plot in Streamlit
+        st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
         st.header("Data Display Dashboard")
@@ -118,3 +149,5 @@ if page == "Projects":
         This AI bot was trained to play chess using reinforcement learning and neural networks.  
         The model learns from thousands of simulated games and improves over time by evaluating board positions.
         """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/chess-ai-bot)")
+
