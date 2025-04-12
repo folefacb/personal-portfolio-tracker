@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.graph_objects as go
 
-
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
 
@@ -62,24 +61,27 @@ if page == "Projects":
 
     with tab1:
         st.header("Bond Trading Algorithm")
-        st.markdown("""
-        This project involves an automated bond trading algorithm using QuantConnect.  
+        st.markdown("""This project involves an automated bond trading algorithm using QuantConnect.  
         It utilizes indicators like moving averages and implements position sizing, stop-loss, and take-profit strategies.  
         Designed for risk-adjusted returns and market efficiency.
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/bond-trading-algorithm)")
-    
+
         # Load the trade file
         uploaded_file = r"Determined Yellow Dinosaur_trades.csv"
         df = pd.read_csv(uploaded_file)
-    
+
         # Preprocessing
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
-    
+
+        # Display the dataframe
+        st.subheader("Trade Data")
+        st.dataframe(df)
+
         # Setup plot
         fig = go.Figure()
-    
+
         # Cumulative portfolio value line
         fig.add_trace(go.Scatter(
             x=df['Time'],
@@ -88,7 +90,7 @@ if page == "Projects":
             name='Portfolio Value',
             line=dict(color='#00ffff', width=2.5)
         ))
-    
+
         # Buys
         buys = df[df['Quantity'] > 0]
         fig.add_trace(go.Scatter(
@@ -99,7 +101,7 @@ if page == "Projects":
             marker=dict(color='limegreen', size=12, symbol='triangle-up'),
             hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
         ))
-    
+
         # Sells
         sells = df[df['Quantity'] < 0]
         fig.add_trace(go.Scatter(
@@ -110,7 +112,7 @@ if page == "Projects":
             marker=dict(color='crimson', size=12, symbol='triangle-down'),
             hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
         ))
-    
+
         # Layout aesthetics like QuantConnect
         fig.update_layout(
             title='📈 Bond Trading Strategy Backtest',
@@ -122,22 +124,19 @@ if page == "Projects":
             margin=dict(l=40, r=40, t=60, b=40),
             height=600
         )
-    
-        st.plotly_chart(fig, use_container_width=True)
 
+        st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
         st.header("Data Display Dashboard")
-        st.markdown("""
-        A sleek, interactive data visualization dashboard built with Streamlit and Plotly.  
+        st.markdown("""A sleek, interactive data visualization dashboard built with Streamlit and Plotly.  
         It allows users to explore stock prices, custom filters, and generate insights from uploaded datasets.
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/data-dashboard)")
 
     with tab3:
         st.header("Chess AI Machine Learning Bot")
-        st.markdown("""
-        This AI bot was trained to play chess using reinforcement learning and neural networks.  
+        st.markdown("""This AI bot was trained to play chess using reinforcement learning and neural networks.  
         The model learns from thousands of simulated games and improves over time by evaluating board positions.
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/chess-ai-bot)")
