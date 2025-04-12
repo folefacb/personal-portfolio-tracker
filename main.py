@@ -16,7 +16,7 @@ if page == "Home":
 
     with col1:
         st.title("Hi There! It's me, Bebongnchu!")
-        st.markdown("""Hi! My name is Abebongnchu, and I’m a third-year student at McMaster University with a strong passion for finance and technology.
+        st.markdown("""Hi! My name is Bebongnchu, and I’m a third-year student at McMaster University with a strong passion for finance and technology.
 
 I'm always exploring the integration and intersection of both fields through hands-on projects and personal initiatives.
 
