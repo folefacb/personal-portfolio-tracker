@@ -40,6 +40,13 @@ Here, you can learn more about my portfolio, academic journey, and even a few of
             unsafe_allow_html=True
         )
 
-    
+    col3, col4 = st.columns([0.1, 0.9])
+    with col3:
+        st.image("https://cdn-icons-png.flaticon.com/512/25/25231.png", width=30)
+    with col4:
+        st.markdown(
+            "[GitHub](https://github.com/folefacb)",
+            unsafe_allow_html=True
+        )
                 
 
