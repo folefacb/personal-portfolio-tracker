@@ -22,7 +22,7 @@ if page == "Home":
         """)
 
     with col2:
-        st.image(photo_me, use_column_width=True)
+        st.image(photo_me, use_container_width=True)
 
     
                 
