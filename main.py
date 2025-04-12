@@ -1,6 +1,5 @@
 import numpy as np
 import pandas as pd
-import yfinance as yf
 import matplotlib.pyplot as plt
 import streamlit as st
 
@@ -77,26 +76,33 @@ if page == "Projects":
         df = df.sort_values('Time')
 
         # Portfolio Value Line (Use Streamlit's line_chart for continuous line)
-        st.subheader("Portfolio Value Over Time")
-        st.line_chart(df.set_index('Time')['Value'])
+        st.subheader("Buy and Sell Signal Graph")
 
-        # Buys and Sells using Streamlit's scatter_chart
+        # Buys and Sells
         buys = df[df['Quantity'] > 0]
         sells = df[df['Quantity'] < 0]
 
-        # Plotting buys and sells as scatter charts
-        st.subheader("Buy and Sell Events")
-        
-        buy_data = buys[['Time', 'Value']]
-        sell_data = sells[['Time', 'Value']]
+        # Connect buys and sells with a continuous line
+        fig, ax = plt.subplots(figsize=(10, 6))
 
-        # Display Buy and Sell events
-        st.markdown("**Buy Events**")
-        st.scatter_chart(buy_data.set_index('Time'))
+        # Plot the portfolio value (just the continuous line of the portfolio)
+        ax.plot(df['Time'], df['Value'], label='Portfolio Value', color='lightblue', alpha=0.7)
 
-        st.markdown("**Sell Events**")
-        st.scatter_chart(sell_data.set_index('Time'))
-        
+        # Plot Buy signals
+        ax.scatter(buys['Time'], buys['Value'], color='green', label='Buy Signal', marker='^', s=100)
+
+        # Plot Sell signals
+        ax.scatter(sells['Time'], sells['Value'], color='red', label='Sell Signal', marker='v', s=100)
+
+        # Titles and Labels
+        ax.set_title('📈 Bond Trading Strategy Backtest with Buy/Sell Signals', fontsize=14)
+        ax.set_xlabel('Date')
+        ax.set_ylabel('Portfolio Value ($)')
+        ax.legend(loc='upper left')
+        ax.grid(True)
+
+        st.pyplot(fig)
+
     with tab2:
         st.header("Data Display Dashboard")
         st.markdown("""
