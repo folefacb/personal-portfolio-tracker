@@ -56,5 +56,31 @@ Here, you can learn more about my portfolio, academic journey, and even a few of
             "[View My Resume](file:///C:/Users/bebon/Downloads/resume%20(43).pdf)",
             unsafe_allow_html=True
         )
-                
+if page == "Projects":
+    tab1, tab2, tab3 = st.tabs(["📈 Bond Trading Algorithm", "📊 Data Display Dashboard", "♟️ Chess AI Bot"])
+
+    with tab1:
+        st.header("Bond Trading Algorithm")
+        st.markdown("""
+        This project involves an automated bond trading algorithm using QuantConnect.  
+        It utilizes indicators like moving averages and implements position sizing, stop-loss, and take-profit strategies.  
+        Designed for risk-adjusted returns and market efficiency.
+        """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/bond-trading-algorithm)")
+
+    with tab2:
+        st.header("Data Display Dashboard")
+        st.markdown("""
+        A sleek, interactive data visualization dashboard built with Streamlit and Plotly.  
+        It allows users to explore stock prices, custom filters, and generate insights from uploaded datasets.
+        """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/data-dashboard)")
+
+    with tab3:
+        st.header("Chess AI Machine Learning Bot")
+        st.markdown("""
+        This AI bot was trained to play chess using reinforcement learning and neural networks.  
+        The model learns from thousands of simulated games and improves over time by evaluating board positions.
+        """)
+        st.markdown("[🔗 View on GitHub](https://github.com/your-username/chess-ai-bot)")
 
