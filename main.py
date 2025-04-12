@@ -15,11 +15,11 @@ if page == "Home":
 
     with col1:
         st.title("Hi There! It's me, Bebongnchu!")
-        st.markdown("""
-        Hi everyone! I am Bebongnchu, and this is my **personal portfolio website**!
-        
-        Feel free to explore the different sections to learn more about my projects, academic work, and hobbies.
-        """)
+        st.markdown("""Hi! My name is Abebongnchu, and I’m a third-year student at McMaster University with a strong passion for finance and technology.
+
+I'm always exploring the integration and intersection of both fields through hands-on projects and personal initiatives.
+
+Here, you can learn more about my portfolio, academic journey, and even a few of my personal interests. Enjoy!""")
 
     with col2:
         st.image(photo_me, use_container_width=True)
