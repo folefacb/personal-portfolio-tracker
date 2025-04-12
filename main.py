@@ -4,6 +4,7 @@ import yfinance as yf
 import matplotlib.pyplot as plt
 import streamlit as st
 
+
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
 
