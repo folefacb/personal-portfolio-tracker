@@ -75,57 +75,41 @@ if page == "Projects":
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
 
-        # Display the dataframe
-        st.subheader("Trade Data")
-        st.dataframe(df)
+        # Setup two columns: One for data and one for the graph
+        col1, col2 = st.columns([1, 2])
 
-        # Setup plot
-        fig = go.Figure()
+        # In the first column, display the trade data
+        with col1:
+            st.subheader("Trade Data")
+            st.dataframe(df)
 
-        # Cumulative portfolio value line
-        fig.add_trace(go.Scatter(
-            x=df['Time'],
-            y=df['Value'],
-            mode='lines',
-            name='Portfolio Value',
-            line=dict(color='#00ffff', width=2.5)
-        ))
+        # In the second column, plot the graph
+        with col2:
+            # Setup plot
+            fig = go.Figure()
 
-        # Buys
-        buys = df[df['Quantity'] > 0]
-        fig.add_trace(go.Scatter(
-            x=buys['Time'],
-            y=buys['Value'],
-            mode='markers',
-            name='Buy',
-            marker=dict(color='limegreen', size=12, symbol='triangle-up'),
-            hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
-        ))
+            # Portfolio value line (normal line graph)
+            fig.add_trace(go.Scatter(
+                x=df['Time'],
+                y=df['Value'],
+                mode='lines',
+                name='Portfolio Value',
+                line=dict(color='#00ffff', width=2.5)
+            ))
 
-        # Sells
-        sells = df[df['Quantity'] < 0]
-        fig.add_trace(go.Scatter(
-            x=sells['Time'],
-            y=sells['Value'],
-            mode='markers',
-            name='Sell',
-            marker=dict(color='crimson', size=12, symbol='triangle-down'),
-            hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
-        ))
+            # Layout aesthetics like QuantConnect
+            fig.update_layout(
+                title='📈 Bond Trading Strategy Backtest',
+                xaxis=dict(title='Date', rangeslider=dict(visible=True)),
+                yaxis=dict(title='Portfolio Value ($)', fixedrange=False),
+                hovermode='x unified',
+                template='plotly_dark',
+                legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+                margin=dict(l=40, r=40, t=60, b=40),
+                height=600
+            )
 
-        # Layout aesthetics like QuantConnect
-        fig.update_layout(
-            title='📈 Bond Trading Strategy Backtest',
-            xaxis=dict(title='Date', rangeslider=dict(visible=True)),
-            yaxis=dict(title='Portfolio Value ($)', fixedrange=False),
-            hovermode='x unified',
-            template='plotly_dark',
-            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
-            margin=dict(l=40, r=40, t=60, b=40),
-            height=600
-        )
-
-        st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
         st.header("Data Display Dashboard")
@@ -140,4 +124,3 @@ if page == "Projects":
         The model learns from thousands of simulated games and improves over time by evaluating board positions.
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/chess-ai-bot)")
-
