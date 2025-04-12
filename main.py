@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 # Use raw string for Windows file path
-photo_me = r"C:\Users\bebon\OneDrive\Bebongnchu's Projects\BCP_Bebongnchu (2).jpg"
+photo_me = 'Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
 
 st.sidebar.title("Navigation")
 page = st.sidebar.radio("Go to", ["Home", "Projects", "Research/Thesis", "Hobbies and Interests"])
