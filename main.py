@@ -72,7 +72,7 @@ if page == "Projects":
         # Upload Excel file
         uploaded_file = r"Determined Yellow Dinosaur_trades.csv"
      # Load Excel into DataFrame
-        df = pd.read_excel(uploaded_file)
+        df = pd.read_csv(uploaded_file)
     
         # Clean and prep data
         df['Time'] = pd.to_datetime(df['Time'])
