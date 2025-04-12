@@ -87,7 +87,7 @@ if page == "Projects":
         etf_data = yf.download(etfs, start=start_date, end=end_date)['Adj Close']
         
         # Normalize ETF prices for easier comparison
-        etf_data_normalized = etf_data / etf_data.iloc[0]  # Normalize to start at the same value
+        etf_data_normalized = etf_data.div(etf_data.iloc[0])  # Normalize to start at the same value
         
         # Cumulative portfolio value line
         fig = go.Figure()
