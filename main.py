@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.graph_objects as go
-from technical_analysis import Indicators  # Fixed import for technical-analysis package
+import technical_analysis 
+import Indicators  # Fixed import for technical-analysis package
 
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
