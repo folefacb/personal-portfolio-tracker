@@ -79,15 +79,14 @@ if page == "Projects":
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
     
-        # Calculate cumulative portfolio value
-        df['CumulativeValue'] = df['Value'].cumsum()
+        
     
         # Plot
         fig = go.Figure()
     
         # Cumulative portfolio line
         fig.add_trace(go.Scatter(
-            x=df['Time'], y=df['CumulativeValue'],
+            x=df['Time'], y=df['Value'],
             mode='lines+markers',
             name='Portfolio Value',
             line=dict(color='cyan', width=2)
@@ -96,7 +95,7 @@ if page == "Projects":
         # Buy markers
         buys = df[df['Quantity'] > 0]
         fig.add_trace(go.Scatter(
-            x=buys['Time'], y=buys['CumulativeValue'],
+            x=buys['Time'], y=buys['Value'],
             mode='markers', name='Buy',
             marker=dict(color='green', size=10, symbol='triangle-up')
         ))
@@ -104,7 +103,7 @@ if page == "Projects":
         # Sell markers
         sells = df[df['Quantity'] < 0]
         fig.add_trace(go.Scatter(
-            x=sells['Time'], y=sells['CumulativeValue'],
+            x=sells['Time'], y=sells['Value'],
             mode='markers', name='Sell',
             marker=dict(color='red', size=10, symbol='triangle-down')
         ))
@@ -112,7 +111,7 @@ if page == "Projects":
         fig.update_layout(
             title='📈 Cumulative Portfolio Value Over Time',
             xaxis_title='Date',
-            yaxis_title='Cumulative Value ($)',
+            yaxis_title=' Value of Portfolio($)',
             template='plotly_dark',
             hovermode='x unified'
         )
