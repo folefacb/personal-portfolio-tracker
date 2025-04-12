@@ -3,8 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import streamlit as st
 import plotly.graph_objects as go
-import technical_analysis 
-import Indicators  # Fixed import for technical-analysis package
+
 
 # Use raw string for Windows/Linux-friendly relative path
 photo_me = r"Bebongnchu's Projects/BCP_Bebongnchu (2).jpg"
@@ -77,64 +76,55 @@ if page == "Projects":
         # Preprocessing
         df['Time'] = pd.to_datetime(df['Time'])
         df = df.sort_values('Time')
-
-        # Technical analysis using the technical-analysis package
-        indicators = Indicators(df)
-        df['SMA'] = indicators.sma(window=14)  # Simple Moving Average (14 periods)
-
-        # Generate Buy/Sell signals based on price crossing SMA
-        df['Buy Signal'] = (df['Close'] > df['SMA']) & (df['Close'].shift(1) <= df['SMA'].shift(1))
-        df['Sell Signal'] = (df['Close'] < df['SMA']) & (df['Close'].shift(1) >= df['SMA'].shift(1))
-
-        # Create a Plotly figure
+    
+        # Setup plot
         fig = go.Figure()
-
-        # Add Candlestick Chart
-        fig.add_trace(go.Candlestick(
-            x=df['Time'],
-            open=df['Open'],
-            high=df['High'],
-            low=df['Low'],
-            close=df['Close'],
-            name='Candlesticks',
-            increasing_line_color='green', decreasing_line_color='red'
-        ))
-
-        # Add Buy signals
-        buy_signals = df[df['Buy Signal'] == True]
+    
+        # Cumulative portfolio value line
         fig.add_trace(go.Scatter(
-            x=buy_signals['Time'],
-            y=buy_signals['Close'],
+            x=df['Time'],
+            y=df['Value'],
+            mode='lines',
+            name='Portfolio Value',
+            line=dict(color='#00ffff', width=2.5)
+        ))
+    
+        # Buys
+        buys = df[df['Quantity'] > 0]
+        fig.add_trace(go.Scatter(
+            x=buys['Time'],
+            y=buys['Value'],
             mode='markers',
-            name='Buy Signal',
-            marker=dict(color='lime', size=10, symbol='triangle-up'),
+            name='Buy',
+            marker=dict(color='limegreen', size=12, symbol='triangle-up'),
             hovertemplate='Buy<br>Time: %{x}<br>Value: %{y}<extra></extra>'
         ))
-
-        # Add Sell signals
-        sell_signals = df[df['Sell Signal'] == True]
+    
+        # Sells
+        sells = df[df['Quantity'] < 0]
         fig.add_trace(go.Scatter(
-            x=sell_signals['Time'],
-            y=sell_signals['Close'],
+            x=sells['Time'],
+            y=sells['Value'],
             mode='markers',
-            name='Sell Signal',
-            marker=dict(color='crimson', size=10, symbol='triangle-down'),
+            name='Sell',
+            marker=dict(color='crimson', size=12, symbol='triangle-down'),
             hovertemplate='Sell<br>Time: %{x}<br>Value: %{y}<extra></extra>'
         ))
-
-        # Layout customization
+    
+        # Layout aesthetics like QuantConnect
         fig.update_layout(
-            title='📈 Bond Trading Strategy with Buy/Sell Signals',
-            xaxis_title='Date',
-            yaxis_title='Portfolio Value ($)',
-            xaxis_rangeslider_visible=False,
+            title='📈 Bond Trading Strategy Backtest',
+            xaxis=dict(title='Date', rangeslider=dict(visible=True)),
+            yaxis=dict(title='Portfolio Value ($)', fixedrange=False),
+            hovermode='x unified',
             template='plotly_dark',
-            height=600,
-            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1)
+            legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+            margin=dict(l=40, r=40, t=60, b=40),
+            height=600
         )
-
-        # Display the plot in Streamlit
+    
         st.plotly_chart(fig, use_container_width=True)
+
 
     with tab2:
         st.header("Data Display Dashboard")
