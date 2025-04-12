@@ -67,7 +67,59 @@ if page == "Projects":
         Designed for risk-adjusted returns and market efficiency.
         """)
         st.markdown("[🔗 View on GitHub](https://github.com/your-username/bond-trading-algorithm)")
-
+        # Upload Excel file
+        uploaded_file = 
+        
+        if uploaded_file:
+            # Load Excel into DataFrame
+            df = pd.read_excel(uploaded_file)
+        
+            # Clean and prep data
+            df['Time'] = pd.to_datetime(df['Time'])
+            df = df.sort_values('Time')
+        
+            # Calculate cumulative portfolio value
+            df['CumulativeValue'] = df['Value'].cumsum()
+        
+            # Plot
+            fig = go.Figure()
+        
+            # Cumulative portfolio line
+            fig.add_trace(go.Scatter(
+                x=df['Time'], y=df['CumulativeValue'],
+                mode='lines+markers',
+                name='Portfolio Value',
+                line=dict(color='cyan', width=2)
+            ))
+        
+            # Buy markers
+            buys = df[df['Quantity'] > 0]
+            fig.add_trace(go.Scatter(
+                x=buys['Time'], y=buys['CumulativeValue'],
+                mode='markers', name='Buy',
+                marker=dict(color='green', size=10, symbol='triangle-up')
+            ))
+        
+            # Sell markers
+            sells = df[df['Quantity'] < 0]
+            fig.add_trace(go.Scatter(
+                x=sells['Time'], y=sells['CumulativeValue'],
+                mode='markers', name='Sell',
+                marker=dict(color='red', size=10, symbol='triangle-down')
+            ))
+        
+            fig.update_layout(
+                title='📈 Cumulative Portfolio Value Over Time',
+                xaxis_title='Date',
+                yaxis_title='Cumulative Value ($)',
+                template='plotly_dark',
+                hovermode='x unified'
+            )
+        
+            st.plotly_chart(fig, use_container_width=True)
+        
+        else:
+            st.info("Upload an Excel file to begin analysis.")
     with tab2:
         st.header("Data Display Dashboard")
         st.markdown("""
